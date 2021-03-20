@@ -1,21 +1,32 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { View, Text, SafeAreaView, StyleSheet } from 'react-native';
+import Boxes from './src/components/Boxes';
 
-export default function App() {
+const App = () => {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaView style={styles.safeArea}>
+      {/* <View style={[styles.container, styles.pink]}>
+        <Text>Hello world!</Text>
+      </View> */}
+      <Boxes />
+    </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
+  pink: {
+    backgroundColor: 'pink',
+  },
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
+    paddingVertical: 10, // both for margin and paddings
+    paddingHorizontal: 30, // native styles don't have any units, but it corresponds to the density-independant pixels
+    // all positioning is made with flexbox
     alignItems: 'center',
-    justifyContent: 'center',
+    flex: 1,
+  },
+  safeArea: {
+    flex: 2,
   },
 });
+
+export default App;
