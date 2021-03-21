@@ -1,11 +1,23 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, StyleSheet, RefreshControl } from 'react-native';
-
+import {
+  View,
+  Text,
+  // Button,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+  RefreshControl,
+} from 'react-native';
 import PalettePreview from '../../components/PalettePreview';
 
-const Home = ({ navigation }) => {
+const Home = ({ navigation, route }) => {
   const [palettes, setPalettes] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const newColorPalette = route.params
+    ? route.params.newColorPalette
+    : undefined;
+  console.log({ newColorPalette });
 
   const fetchPalettes = useCallback(async () => {
     const response = await fetch(
@@ -33,6 +45,12 @@ const Home = ({ navigation }) => {
     fetchPalettes();
   }, [fetchPalettes]);
 
+  useEffect(() => {
+    if (newColorPalette) {
+      setPalettes((oldPalettes) => [newColorPalette, ...oldPalettes]);
+    }
+  }, [newColorPalette, setPalettes]);
+
   const handlePress = (item) => {
     navigation.navigate('ColorPalette', item);
   };
@@ -46,6 +64,14 @@ const Home = ({ navigation }) => {
           <PalettePreview onPress={() => handlePress(item)} palette={item} />
         )}
         ListEmptyComponent={<Text>There is no palette available...</Text>}
+        ListHeaderComponent={
+          <TouchableOpacity
+            style={styles.buttonModal}
+            onPress={() => navigation.navigate('ColorPaletteModal')}
+          >
+            <Text style={styles.buttonText}>Open Modal</Text>
+          </TouchableOpacity>
+        }
         // refreshControl={
         //   <RefreshControl refreshing={true} onRefresh={() => {}} />
         // } use this prop to pass your custom loader
@@ -64,6 +90,19 @@ const styles = StyleSheet.create({
   },
   list: {
     padding: 10,
+  },
+  buttonModal: {
+    backgroundColor: 'teal',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 50,
+    marginBottom: 20,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 
