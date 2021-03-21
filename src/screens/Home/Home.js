@@ -1,24 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
-import { SOLARIZED, RAINBOW, FRONTEND_MASTERS } from '../../constants/Colors';
+import { View, Text, FlatList, StyleSheet, RefreshControl } from 'react-native';
+
 import PalettePreview from '../../components/PalettePreview';
-
-// Teacher solution
-
-const COLOR_PALETTES = [
-  { paletteName: 'Solarized', colors: SOLARIZED },
-  { paletteName: 'Frontend Masters', colors: FRONTEND_MASTERS },
-  { paletteName: 'Rainbow', colors: RAINBOW },
-];
 
 const Home = ({ navigation }) => {
   const [palettes, setPalettes] = useState([]);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const fetchPalettes = useCallback(async () => {
     const response = await fetch(
@@ -30,6 +17,17 @@ const Home = ({ navigation }) => {
       setPalettes(palettesRes);
     }
   }, []);
+
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    await fetchPalettes();
+
+    //the network request is so quick, that you need to use timeout for better UX
+    // so that loader is visible a little bit longer
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 1000);
+  }, [fetchPalettes]);
 
   useEffect(() => {
     fetchPalettes();
@@ -48,6 +46,13 @@ const Home = ({ navigation }) => {
           <PalettePreview onPress={() => handlePress(item)} palette={item} />
         )}
         ListEmptyComponent={<Text>There is no palette available...</Text>}
+        // refreshControl={
+        //   <RefreshControl refreshing={true} onRefresh={() => {}} />
+        // } use this prop to pass your custom loader
+
+        // use this props if you're okay with native loader
+        refreshing={isRefreshing}
+        onRefresh={handleRefresh}
       />
     </View>
   );
